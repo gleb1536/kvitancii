@@ -1,9 +1,11 @@
 # Python 3 server example
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
+import forming
 
-hostName = "localhost"
+hostName = "192.168.0.3"
 serverPort = 8080
+form = 0
 
 class MyServer(BaseHTTPRequestHandler):
     def answer_fail(self):
@@ -28,6 +30,7 @@ class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):        
         url = self.path.split('?')
         real_url = url[0]
+        print(self.client_address)
         if( len(url) > 1):
             param = url[1]
         else:
@@ -38,13 +41,16 @@ class MyServer(BaseHTTPRequestHandler):
             if( ( len(id_uch) > 1 ) & ( id_uch[0] == 'uch' )):
                 try:
                     id_uch = int(id_uch[1])
+                    if ( ( id_uch > 0 ) & ( id_uch < 530 ) ):
+                        self.answer_str(form.summa[id_uch])
+                        return
                 except:
                     self.answer_fail()
                     return
             else:
                 self.answer_fail()
                 return
-            self.answer_str(id_uch)
+            self.answer_fail()
             return
         elif( real_url == '/kvitancia' ):
             param = param.split('&')
@@ -80,10 +86,11 @@ class MyServer(BaseHTTPRequestHandler):
         else:
             self.answer_fail()
 
-if __name__ == "__main__":        
+if __name__ == "__main__":
+    form = forming.forming()
     webServer = HTTPServer((hostName, serverPort), MyServer)
     print("Server started http://%s:%s" % (hostName, serverPort))
-
+    
     try:
         webServer.serve_forever()
     except KeyboardInterrupt:
