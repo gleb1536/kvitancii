@@ -1,5 +1,6 @@
 # Python 3 server example
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
 import time
 import urllib
 import forming
@@ -7,6 +8,10 @@ import forming
 hostName = "0.0.0.0"
 serverPort = 80
 form = 0
+
+
+class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
+    pass
 
 class MyServer(BaseHTTPRequestHandler):
     def answer_fail(self):
@@ -115,13 +120,10 @@ class MyServer(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     form = forming.forming()
-    webServer = HTTPServer((hostName, serverPort), MyServer)
+    webServer = ThreadingSimpleServer((hostName, serverPort), MyServer)
     print("Server started http://%s:%s" % (hostName, serverPort))
-    
-    try:
-        webServer.serve_forever()
-    except KeyboardInterrupt:
-        pass
+    webServer.timeout = 120
+    webServer.serve_forever()
 
     webServer.server_close()
     print("Server stopped.")
