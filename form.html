@@ -1,0 +1,54 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <script>
+        <!--
+        var HttpClient = function() {
+            this.get = function(aUrl, aCallback) {
+                var anHttpRequest = new XMLHttpRequest();
+                anHttpRequest.onreadystatechange = function() { 
+                    if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
+                        aCallback(anHttpRequest.responseText);
+                }
+        
+                anHttpRequest.open( "GET", aUrl, true );            
+                anHttpRequest.send( null );
+            }
+        }
+        function get_summ(uchastok)
+        {
+            var client = new HttpClient();
+            client.get('/summa?uch='+uchastok, function(response) {
+                document.Sel1.summ.value = Number(response)/100
+            });
+            
+        }
+
+        //-->
+    </script>
+</head>
+<body>
+<H1>Для получения квитанции<br>Заполните анкету</H1>
+(После заполнения номера участка сумма появится автоматически)
+<FORM NAME="Sel1">
+    <!-- Анкета -->
+    <TABLE>
+        <TR><TD><B>№ участка:<B></TD>
+            <TD><INPUT NAME="uch" SIZE=3
+                onBlur="get_summ(this.value)"></TD></TR>
+        <TR><TD><B>ФИО:<B></TD>
+            <TD><INPUT NAME="fio" SIZE=20></TD></TR>
+        <TR><TD><B>Телефоны для шлагбаума:<B></TD></TR>
+        <TR><TD><B>Телефон1:<B></TD>
+            <TD><INPUT NAME="tel1" SIZE=20 VALUE="+7"></TD></TR>
+        <TR><TD><B>Телефон2:<B></TD>
+            <TD><INPUT NAME="tel2" SIZE=20 VALUE="+7"></TD></TR>
+        <TR><TD><B>Сумма оплаты:<B></TD>
+            <TD><INPUT NAME="summ" SIZE=10></TD></TR>
+    </TABLE>
+    <!-- Кнопки готовности и сброса -->
+    <INPUT TYPE="submit" VALUE="Готово" formaction="kvitancia" formmethod="get">
+    <INPUT TYPE="reset" VALUE="Сброс">
+</FORM>
+</body>
+</html>

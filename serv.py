@@ -1,10 +1,11 @@
 # Python 3 server example
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
+import urllib
 import forming
 
-hostName = "192.168.0.3"
-serverPort = 8080
+hostName = "0.0.0.0"
+serverPort = 80
 form = 0
 
 class MyServer(BaseHTTPRequestHandler):
@@ -18,17 +19,32 @@ class MyServer(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
-        self.wfile.write(bytes("<html><head></head><body>%s<body></html>" % string, "utf-8"))
+        self.wfile.write(bytes(str(string), "utf-8"))
 
-    def answer_kvitancia(self,uch,fio,tel,summ):
+    def answer_form(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
+        content = open("form.html", 'rb').read()
+        self.wfile.write(content)
+
+    def answer_file(self,filename):
+        self.send_response(200)
+        self.send_header("Content-type", "ya-river.pdf")
+        self.end_headers()
+        content = open(filename, 'rb').read()
+        self.wfile.write(content)
+
+    def answer_kvitancia(self,uch,fio,tel1,tel2,summ):
+        fio = fio.encode('utf8')
         print(fio)
-        self.wfile.write(bytes("<html><head></head><body>%d<br>%s<br>%s<br>%s<body></html>" % (uch,fio,tel,summ), "utf-8"))
+        file_n = form.form(uch,fio,tel1,tel2,summ,self.client_address[0])
+        self.answer_file(file_n)
+                
     
-    def do_GET(self):        
-        url = self.path.split('?')
+    def do_GET(self):  
+        url =  urllib.parse.unquote(self.path)  
+        url = url.split('?')
         real_url = url[0]
         print(self.client_address)
         if( len(url) > 1):
@@ -54,35 +70,46 @@ class MyServer(BaseHTTPRequestHandler):
             return
         elif( real_url == '/kvitancia' ):
             param = param.split('&')
+            
+            uch = param[0].split('=')
+            if uch[0] == 'uch':
+                uch = int(uch[1])
+            else:
+                self.answer_fail()
+                return
+            FIO = param[1].split('=')
+            if FIO[0] == 'fio':
+                FIO = FIO[1]
+            else:
+                self.answer_fail()
+                return
+            tel1 = param[2].split('=')
+            if tel1[0] == 'tel1':
+                tel1 = tel1[1]
+            else:
+                self.answer_fail()
+                return
+            tel2 = param[3].split('=')
+            if tel2[0] == 'tel2':
+                tel2 = tel2[1]
+            else:
+                self.answer_fail()
+                return
+            summ = param[4].split('=')
+            if summ[0] == 'summ':
+                summ = summ[1]
+            else:
+                self.answer_fail()
+                return
+            self.answer_kvitancia(uch,FIO,tel1,tel2,summ)
+
             try:
-                uch = param[0].split('=')
-                if uch[0] == 'uch':
-                    uch = int(uch[1])
-                else:
-                    self.answer_fail()
-                    return
-                FIO = param[1].split('=')
-                if FIO[0] == 'fio':
-                    FIO = FIO[1]
-                else:
-                    self.answer_fail()
-                    return
-                tel = param[2].split('=')
-                if tel[0] == 'tel':
-                    tel = tel[1]
-                else:
-                    self.answer_fail()
-                    return
-                summ = param[3].split('=')
-                if summ[0] == 'summ':
-                    summ = summ[1]
-                else:
-                    self.answer_fail()
-                    return
-                self.answer_kvitancia(uch,FIO,tel,summ)
+                pass
             except:
                 self.answer_fail()
                 return
+        elif( real_url == '/' ):
+            self.answer_form()
         else:
             self.answer_fail()
 
