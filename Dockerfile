@@ -5,18 +5,12 @@ FROM python:3.7-stretch
 WORKDIR /app
 
 #Install packets on build parts
-RUN pip install pandas
-RUN pip install docxtpl
-RUN pip install qrcode
-RUN pip install xlrd 
-RUN pip install openpyxl
+RUN pip install -r requiments.txt
 RUN apt update 
 RUN apt-get -y install libreoffice  
 RUN mkdir qrs
 RUN mkdir docs
 RUN mkdir pdfs
-RUN pip install Image
-RUN pip install requests
 
 
 # Copy the current directory contents into the container at /app
